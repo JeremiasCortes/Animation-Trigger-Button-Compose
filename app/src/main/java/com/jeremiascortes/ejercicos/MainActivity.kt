@@ -42,7 +42,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Screen() {
-    Column() {
+    Column(
+        modifier = Modifier.padding(top=24.dp)
+    ) {
         AnimatedSlidingToggleButtons()
         AnimatedSlidingToggleButtons2()
     }
@@ -66,7 +68,6 @@ fun AnimatedSlidingToggleButtons(
     Box(
         Modifier
             .padding(16.dp)
-            .padding(top = 24.dp)
             .height(48.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
@@ -79,20 +80,13 @@ fun AnimatedSlidingToggleButtons(
             label = "offsetX"
         )
 
-        // Forma dinámica según la posición
-        val sliderShape = when (selectedIndex) {
-            0 -> RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp)
-            options.size - 1 -> RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp)
-            else -> RoundedCornerShape(0.dp) // Opcional, por si amplías a más de dos opciones
-        }
-
-        // Barra deslizante de fondo
+        // Barra deslizante de fondo (sin texto)
         Box(
             Modifier
                 .offset { IntOffset(offsetX.toInt(), 0) }
                 .width(with(LocalDensity.current) { buttonWidth.value.toDp() })
                 .fillMaxHeight()
-                .clip(sliderShape)
+                .clip(RoundedCornerShape(50, 0, 0, 50))
                 .background(activeColor)
         )
 
@@ -102,21 +96,23 @@ fun AnimatedSlidingToggleButtons(
         ) {
             options.forEachIndexed { index, text ->
                 Box(
-                    contentAlignment = Alignment.Center, modifier = Modifier
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
                         .onGloballyPositioned { coords ->
                             if (index == 0) buttonWidth.value = coords.size.width.toFloat()
                         }
                         .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
+                            indication = null, // Esto elimina el efecto visual gris
+                            interactionSource = remember { MutableInteractionSource() } // Necesario cuando se quita la indicación
                         ) {
                             if (selectedIndex != index) {
                                 selectedIndex = index
                                 onSelected(index)
                             }
-                        }) {
+                        }
+                ) {
                     Text(
                         text = text,
                         color = if (selectedIndex == index) textActive else textInactive,
